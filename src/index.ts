@@ -1,9 +1,8 @@
-const express = require("express");
-const notionhq = require("@notionhq/client");
-const nodeFetch = require("node-fetch");
+import express from "express";
+import * as notionhq from "@notionhq/client";
 
-const AUTH_SECRET = process.env.AUTH_SECRET;
-const DATABASE_ID = process.env.DATABASE_ID;
+const AUTH_SECRET = process.env.AUTH_SECRET || "";
+const DATABASE_ID = process.env.DATABASE_ID || "";
 
 const notion = new notionhq.Client({
   auth: AUTH_SECRET,
@@ -20,15 +19,15 @@ app.post("/", async (req, res) => {
     database_id: DATABASE_ID,
   });
   const properties = db.properties;
-
   const taskName = req.body.event_data.content;
 
   data = {
     title: taskName,
     status: {
       name: "Todo",
-      id: properties.Status["select"].options.find((el) => el.name === "Todo")
-        .id,
+      id:
+        properties.Status?.type === "select" &&
+        properties.Status?.select.options.find((el) => el.name === "Todo")?.id,
     },
   };
 
@@ -37,7 +36,7 @@ app.post("/", async (req, res) => {
   res.sendStatus(200);
 });
 
-const createTextField = (text) => {
+const createTextField = (text: string) => {
   return {
     title: [
       {
@@ -49,7 +48,7 @@ const createTextField = (text) => {
   };
 };
 
-const createSelectField = (name, id) => {
+const createSelectField = (name: string, id: string) => {
   return {
     select: {
       name,
@@ -58,7 +57,7 @@ const createSelectField = (name, id) => {
   };
 };
 
-const addToDatabase = async (data) => {
+const addToDatabase = async (data: any) => {
   const response = await notion.pages.create({
     parent: {
       database_id: DATABASE_ID,
