@@ -21,6 +21,7 @@ app.post("/", async (req, res) => {
   const properties = db.properties;
   const taskName = req.body.event_data.content;
 
+  console.log(req.body);
   console.log(req.body.event_data);
 
   data = {
