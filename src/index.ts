@@ -21,6 +21,8 @@ app.post("/", async (req, res) => {
   const properties = db.properties;
   const taskName = req.body.event_data.content;
 
+  console.log(req.body.event_data);
+
   data = {
     title: taskName,
     status: {
@@ -67,7 +69,6 @@ const addToDatabase = async (data: any) => {
       Status: createSelectField(data.status.name, data.status.id),
     },
   });
-  console.log(response);
 };
 
 app.listen(port, () => {
