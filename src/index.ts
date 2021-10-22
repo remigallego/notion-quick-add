@@ -1,8 +1,10 @@
-import express from "express";
+import express, { Request } from "express";
 import * as notionhq from "@notionhq/client";
+import { TodoistWebhook, TodoistWebhookType } from "./types";
+import * as notionApi from "./notion";
 
-const AUTH_SECRET = process.env.AUTH_SECRET || "";
-const DATABASE_ID = process.env.DATABASE_ID || "";
+export const AUTH_SECRET = process.env.AUTH_SECRET || "";
+export const DATABASE_ID = process.env.DATABASE_ID || "";
 
 const notion = new notionhq.Client({
   auth: AUTH_SECRET,
@@ -13,16 +15,29 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-app.post("/", async (req, res) => {
+app.post("/", async (req: Request<{}, {}, TodoistWebhook>, res) => {
+  if (req.body.event_name === TodoistWebhookType.NewTask)
+    await addItem(req.body);
+  if (req.body.event_name === TodoistWebhookType.DeletedTask)
+    await deleteItem(req.body);
+  res.sendStatus(200);
+});
+
+const deleteItem = async (body: TodoistWebhook) => {
   let data = {};
+  removeFromDatabase(data);
+};
+
+const addItem = async (body: TodoistWebhook) => {
+  let data = {};
+
   const db = await notion.databases.retrieve({
     database_id: DATABASE_ID,
   });
   const properties = db.properties;
-  const taskName = req.body.event_data.content;
+  const taskName = body.event_data.content;
 
-  console.log(req.body);
-  console.log(req.body.event_data);
+  /* console.log(req.body); */
 
   data = {
     title: taskName,
@@ -34,43 +49,10 @@ app.post("/", async (req, res) => {
     },
   };
 
-  addToDatabase(data);
-
-  res.sendStatus(200);
-});
-
-const createTextField = (text: string) => {
-  return {
-    title: [
-      {
-        text: {
-          content: text,
-        },
-      },
-    ],
-  };
+  notionApi.addToDatabase(notion, data);
 };
 
-const createSelectField = (name: string, id: string) => {
-  return {
-    select: {
-      name,
-      id,
-    },
-  };
-};
-
-const addToDatabase = async (data: any) => {
-  const response = await notion.pages.create({
-    parent: {
-      database_id: DATABASE_ID,
-    },
-    properties: {
-      Name: createTextField(data.title),
-      Status: createSelectField(data.status.name, data.status.id),
-    },
-  });
-};
+const removeFromDatabase = async (data: any) => {};
 
 app.listen(port, () => {
   console.log("--- Server started! ---");
