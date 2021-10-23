@@ -1,2 +1,8 @@
 # notion-quick-add
-Quickly adds an item to a Notion databse
+Todoist webhook that adds/removes items to a Notion databse
+
+# Configuration
+| Variable      | Description            |
+|---------------|------------------------|
+| DATABASE_ID   | Notion database id     |
+| TOKEN         | Notion secret token    |
