@@ -1,4 +1,4 @@
-# notion-quick-add
+# Todoist to Notion Database
 Todoist webhook that adds/removes items to a Notion databse
 
 # Configuration
