@@ -5,4 +5,4 @@ Todoist webhook that adds/removes items to a Notion databse
 | Variable      | Description            |
 |---------------|------------------------|
 | DATABASE_ID   | Notion database id     |
-| TOKEN         | Notion secret token    |
+| AUTH_SECRET   | Notion secret token    |
